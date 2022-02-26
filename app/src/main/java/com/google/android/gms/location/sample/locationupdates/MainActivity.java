@@ -431,10 +431,8 @@ public class MainActivity extends AppCompatActivity {
         if (mRequestingLocationUpdates && checkPermissions()) {
             startLocationUpdates();
         } else if (!checkPermissions() && variableRepetision<2) {
-            System.out.println("REPETISION");
             requestPermissions();
         }
-
         updateUI();
     }
 
