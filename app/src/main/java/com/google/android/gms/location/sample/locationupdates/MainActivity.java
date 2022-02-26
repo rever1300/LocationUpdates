@@ -156,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
      * Time when the location was updated represented as a String.
      */
     private String mLastUpdateTime;
+    private int variableRepetision;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -176,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
         mLongitudeLabel = getResources().getString(R.string.longitude_label);
         mLastUpdateTimeLabel = getResources().getString(R.string.last_update_time_label);
 
+        variableRepetision = 0;
         mRequestingLocationUpdates = false;
         mLastUpdateTime = "";
 
@@ -428,7 +430,8 @@ public class MainActivity extends AppCompatActivity {
         // location updates if the user has requested them.
         if (mRequestingLocationUpdates && checkPermissions()) {
             startLocationUpdates();
-        } else if (!checkPermissions()) {
+        } else if (!checkPermissions() && variableRepetision<2) {
+            System.out.println("REPETISION");
             requestPermissions();
         }
 
@@ -526,6 +529,7 @@ public class MainActivity extends AppCompatActivity {
                     startLocationUpdates();
                 }
             } else {
+                variableRepetision++;
                 // Permission denied.
 
                 // Notify the user via a SnackBar that they have rejected a core permission for the
