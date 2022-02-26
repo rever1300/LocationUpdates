@@ -327,13 +327,41 @@ public class MainActivity extends AppCompatActivity {
      */
     private void startLocationUpdates() {
         // Begin by checking if the device has the necessary location settings.
-        Log.i(TAG, "All location settings are satisfied.");
+        mSettingsClient.checkLocationSettings(mLocationSettingsRequest)
+                .addOnSuccessListener(this, locationSettingsResponse -> {
+                    Log.i(TAG, "All location settings are satisfied.");
 
-        //noinspection MissingPermission
-        mFusedLocationClient.requestLocationUpdates(mLocationRequest,
-                mLocationCallback, Looper.myLooper());
+                    //noinspection MissingPermission
+                    mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+                            mLocationCallback, Looper.myLooper());
 
-        updateUI();
+                    updateUI();
+                })
+                .addOnFailureListener(this, e -> {
+                    int statusCode = ((ApiException) e).getStatusCode();
+                    switch (statusCode) {
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            Log.i(TAG, "Location settings are not satisfied. Attempting to upgrade " +
+                                    "location settings ");
+                            try {
+                                // Show the dialog by calling startResolutionForResult(), and check the
+                                // result in onActivityResult().
+                                ResolvableApiException rae = (ResolvableApiException) e;
+                                rae.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS);
+                            } catch (IntentSender.SendIntentException sie) {
+                                Log.i(TAG, "PendingIntent unable to execute request.");
+                            }
+                            break;
+                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                            String errorMessage = "Location settings are inadequate, and cannot be " +
+                                    "fixed here. Fix in Settings.";
+                            Log.e(TAG, errorMessage);
+                            Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                            mRequestingLocationUpdates = false;
+                    }
+
+                    updateUI();
+                });
     }
 
     /**
