@@ -416,11 +416,10 @@ public class MainActivity extends AppCompatActivity {
         // It is a good practice to remove location requests when the activity is in a paused or
         // stopped state. Doing so helps battery performance and is especially
         // recommended in applications that request frequent location updates.
-        mFusedLocationClient.removeLocationUpdates(mLocationCallback)
-                .addOnCompleteListener(this, task -> {
-                    mRequestingLocationUpdates = false;
-                    setButtonsEnabledState();
-                });
+
+        mRequestingLocationUpdates = false;
+        setButtonsEnabledState();
+
     }
 
     @Override
